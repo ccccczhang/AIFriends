@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user', () => {
     const photo = ref('http://127.0.0.1:8000/media/user/photos/default.png')
     const profile = ref('')
     const accessToken = ref('')
+    const hasPulledUserInfo = ref(false)
 
     function isLogin(){
         return !!accessToken.value //这里切记一定要带value，不带不会报错，条件就会永真
@@ -31,6 +32,10 @@ export const useUserStore = defineStore('user', () => {
         accessToken.value = ''
     }
 
+    function setHasPulledUserInfo(newStatus){
+        hasPulledUserInfo.value = newStatus
+    }
+
     return {
         id,
         username,
@@ -41,6 +46,8 @@ export const useUserStore = defineStore('user', () => {
         setAccessToken,
         setUserInfo,
         logout,
+        hasPulledUserInfo,
+        setHasPulledUserInfo
     }
 
 })
