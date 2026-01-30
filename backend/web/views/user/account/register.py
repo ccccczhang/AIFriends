@@ -1,3 +1,5 @@
+import traceback
+
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
@@ -31,7 +33,7 @@ class RegisterView(APIView):
                 'photo': user_profile.photo.url,  # 必须加url才能返回地址
                 'profile': user_profile.profile,
             })
-            response.set.cookies(
+            response.set_cookie(
                 key='refresh_token',
                 value='str(refresh)',
                 httponly=True,
@@ -42,6 +44,8 @@ class RegisterView(APIView):
             return response
 
         except:
+            import traceback
+            print(traceback.format_exc())
             return Response({
                 'result': '系统异常，请稍后再试'
             })
