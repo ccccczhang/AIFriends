@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated] #强制用户必须登录才能进行后续退出操作
+    permission_classes = [IsAuthenticated]  #强制用户必须登录才能进行后续退出操作
     def post(self, request):
         response = Response({
             'result': 'success',
