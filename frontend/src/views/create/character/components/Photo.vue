@@ -13,7 +13,7 @@ watch(() => props.photo, newVal => {
 
 const fileInputRef = useTemplateRef('file-input-ref')
 const modalRef = useTemplateRef('modal-ref')
-const croppieRef = useTemplateRef('croppie-ref')
+const croppieRef = useTemplateRef('croppie-ref') //图片裁剪插件
 let croppie = null
 
 async function openModal(photo) {
@@ -32,7 +32,7 @@ async function openModal(photo) {
     url: photo,
   })
 }
-
+// 剪裁
 async function crop() {
   if (!croppie) return
 
@@ -55,7 +55,7 @@ function onFileChange(e) {
   }
   reader.readAsDataURL(file)
 }
-
+// 释放内存
 onBeforeUnmount(() => {
   croppie?.destroy()
 })
@@ -68,18 +68,20 @@ defineExpose({
 <template>
   <div class="flex justify-center">
     <div class="avatar relative">
+      <!-- 将图片打印上去，如果没有就显示一块灰团 -->
       <div v-if="myPhoto" class="w-28 rounded-full">
         <img :src="myPhoto" alt="">
       </div>
       <div v-else class="w-28 h-28 rounded-full bg-base-200"></div>
+      <!-- fileInputRef.click():触发隐藏的文件选择框,bg-black/20:半透明黑色遮罩,absolute left-0 top-0:相对于.avatar覆盖在头像上,cursor-pointer:鼠标变成手型 -->
       <div @click="fileInputRef.click()" class="w-28 h-28 rounded-full bg-black/20 absolute left-0 top-0 flex justify-center items-center cursor-pointer">
         <CameraIcon />
       </div>
     </div>
   </div>
-
+  <!-- ref:跟随，动态，type="file":文件上传输入框, class="hidden":隐藏，不直接让用户点,accept="image/*":只允许选择图片,@change="onFileChange":监听文件，切换  -->
   <input ref="file-input-ref" type="file" class="hidden" accept="image/*" @change="onFileChange">
-
+  <!-- dialog:弹窗(dialog 模态框)，transition-none:防止图片角落出现白边框，禁用动画 -->
   <dialog ref="modal-ref" class="modal">
     <div class="modal-box transition-none">
       <button @click="modalRef.close()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
