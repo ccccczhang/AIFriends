@@ -15,7 +15,7 @@ class CreateCharacterView(APIView):
             name = request.data.get('name').strip()
             profile = request.data.get('profile').strip()[:100000]
             photo = request.FILES.get('photo', None)
-            background_image = request.FILES.get('background_image', None)
+            background_image = request.FILES.get('background_image', None) #后端文件为background_image，前端必须完全对应
 
             if not name:
                 return Response({
@@ -35,7 +35,7 @@ class CreateCharacterView(APIView):
                 })
 
             Character.objects.create(
-                auther = user_profile,
+                author = user_profile,
                 name = name,
                 profile = profile,
                 photo = photo,
@@ -45,6 +45,8 @@ class CreateCharacterView(APIView):
                 'result': 'success',
             })
         except:
+            import traceback
+            print(traceback.print_exc())
             return Response({
                 'result': '系统异常，请稍后重试'
             })
