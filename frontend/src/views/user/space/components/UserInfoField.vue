@@ -7,6 +7,7 @@ defineProps(['userProfile'])
     <div class="avatar">
       <div class="w-44 rounded-full">
         <img :src="userProfile.photo" alt="">
+
       </div>
     </div>
     <div class="flex flex-col justify-center w-64 h-44">

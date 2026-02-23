@@ -17,7 +17,7 @@ class GetListCharacterView(APIView):
             user_profile = UserProfile.objects.get(user=user)
             characters_raw = Character.objects.filter( #角色原始编号
                 author=user_profile
-            ).order_by('-id')[items_count: items_count + 20] # -代表从后往前, []python语法
+            ).order_by('-id')[items_count: items_count + 1] # -代表从后往前, []python语法
             characters = []
             for character in characters_raw:
                 author = character.author
