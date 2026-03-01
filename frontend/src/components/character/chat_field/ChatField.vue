@@ -1,7 +1,7 @@
 <script setup>
 import {computed, useTemplateRef} from "vue";
-import InputField from "@/components/character/char_field/input_field/InputField.vue";
-import CharacterPhotoField from "@/components/character/char_field/character_photo_field/CharacterPhotoField.vue";
+import InputField from "@/components/character/chat_field/input_field/InputField.vue";
+import CharacterPhotoField from "@/components/character/chat_field/character_photo_field/CharacterPhotoField.vue";
 
 const props = defineProps(['friend']) // defineProps： 从父组件接收哪些参数
 

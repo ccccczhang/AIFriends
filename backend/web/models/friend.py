@@ -7,6 +7,7 @@ from web.models.user import UserProfile
 
 
 class Friend(models.Model):
+    # models.ForeignKey() 是 Django 模型中定义多对一关系的字段。它会在数据库中创建一个外键列，指向另一个模型的主键，从而实现两个表之间的关联
     me = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     # 给大模型的短期记忆，给大模型总结一下与虚拟人物的关键信息

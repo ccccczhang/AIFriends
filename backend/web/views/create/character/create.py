@@ -45,8 +45,6 @@ class CreateCharacterView(APIView):
                 'result': 'success',
             })
         except:
-            import traceback
-            print(traceback.print_exc())
             return Response({
                 'result': '系统异常，请稍后重试'
             })

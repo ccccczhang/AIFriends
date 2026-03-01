@@ -1,9 +1,8 @@
 # 查看所有好友
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from web.models.character import Character
 from web.models.friend import Friend
 
 
@@ -11,12 +10,12 @@ class GetListFriendView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
-            items_count = int(request.query_params.get('items_count', 0)) # 查看客户端一共有多少元素
-            friend_raw = Friend.objects.filter(
+            items_count = int(request.query_params.get('items_count', 0))
+            friends_raw = Friend.objects.filter(
                 me__user=request.user
-            ).order_by('-update_time')[items_count:items_count + 20]
+            ).order_by('-update_time')[items_count: items_count + 20]
             friends = []
-            for friend in friend_raw:
+            for friend in friends_raw:
                 character = friend.character
                 author = character.author
                 friends.append({
@@ -28,7 +27,7 @@ class GetListFriendView(APIView):
                         'photo': character.photo.url,
                         'background_image': character.background_image.url,
                         'author': {
-                            'id': author.user_id,
+                            'user_id': author.user_id,
                             'username': author.user.username,
                             'photo': author.photo.url,
                         }
@@ -40,5 +39,6 @@ class GetListFriendView(APIView):
             })
         except:
             return Response({
-                'result': '系统异常，请稍后重试',
+                'result': '系统异常，请稍后重试'
             })
+
