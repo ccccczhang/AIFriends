@@ -11,7 +11,7 @@ defineProps(['character'])
       </div>
     </div>
     <div class="text-white text-sm line-clamp-1 break-all">
-      {{ character.name }}啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
+      {{ character.name }}
     </div>
   </div>
 </template>

@@ -13,7 +13,6 @@ export const useUserStore = defineStore('user', () => {
         return !!accessToken.value  // 必须带value!!!!!!!!!
     }
 
-
     function setAccessToken(token){
         accessToken.value = token
     }
