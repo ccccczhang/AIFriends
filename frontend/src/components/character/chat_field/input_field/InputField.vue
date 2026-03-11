@@ -11,6 +11,8 @@ import {c} from "vue-router/dist/devtools-EWN81iOl.mjs";
 const inputRef = useTemplateRef('input-ref')
 const message = ref('')
 const props = defineProps(['friendId']) // 接收从父组件ChatField传来的friendId
+const emit = defineEmits(['pushBackMessage', 'addToLastMessage']) // 父组件ChatField的函数
+
 let isProcessing = false // 判断是否正在输出，输入输出一段话不能中途再输入
 
 function focus() { // 聚焦函数，使得直接聚焦聊天输入框
@@ -24,6 +26,10 @@ async function handleSend() {
   const content = message.value.trim()
   if(!content) return
   message.value = ''
+
+  emit('pushBackMessage', {role: 'user', content: content, id: crypto.randomUUID()})
+  emit('pushBackMessage', {role: 'ai', content: '', id: crypto.randomUUID()})
+
   try {
     await streamApi('/api/friend/message/chat/', {
       body: {
@@ -34,7 +40,7 @@ async function handleSend() {
         if(isDone) {
           isProcessing = false
         } else if(data.content) { // 这个content是chat.py中的
-          console.log(data.content)
+          emit('addToLastMessage', data.content)
         }
       },
       onerror(err) {
@@ -42,7 +48,6 @@ async function handleSend() {
       },
     })
   } catch (err) {
-    console.log(err)
   }
 }
 

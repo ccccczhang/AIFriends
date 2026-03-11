@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from web.models.friend import Friend
+from web.models.friend import Friend, Message
 from web.views.friend.message.chat.graph import ChatGraph
 
 # 告诉 Django REST framework：这是一个用来输出 SSE 的 Renderer，
@@ -39,23 +39,43 @@ class MessageChatView(APIView):
         # 用langGraph搭建大模型
         app = ChatGraph.create_app()
 
-
         inputs = {
             'messages': [HumanMessage(message)], # 因为graph.py为messages
         }
 
         def event_stream(): # 流式输出
-            final_usage = {} # 记录最终 token 用量
+            full_output = '' # 把大模型输出存入Message数据库？中
+            full_usage = {} # 记录最终 token 用量
             for msg, metadata in app.stream(inputs, stream_mode="messages"):
         # msg：当前模型生成的一小段消息，metadata：元信息（路由、节点名、step 等）
                 if isinstance(msg, BaseMessageChunk): # 判断是不是「消息分片」,BaseMessageChunk 就是这种“半截消息”
                     if msg.content:
+                        full_output += msg.content
                         yield f"data: {json.dumps({'content': msg.content}, ensure_ascii=False)}\n\n" #SSE 核心格式
                         #data: → SSE 规定字段，json.dumps(...) → 前端好解析，\n\n → 一条事件结束标志
                     if hasattr(msg, 'usage_metadata') and msg.usage_metadata:
-                        final_usage = msg.usage_metadata
+                        full_usage = msg.usage_metadata
             yield "data: [DONE]\n\n" # 这是一种约定俗成的结束标记
-            print(final_usage)
+
+            # 存储到数据库的“管理界面”
+            input_tokens = full_usage.get('input_tokens', 0)
+            output_tokens = full_usage.get('output_tokens', 0)
+            total_tokens = full_usage.get('total_tokens', 0)
+            Message.objects.create(
+                friend=friend,
+                user_message=message[:500],
+                input=json.dumps(
+                    [m.model_dump() for m in inputs['messages']],  # 把一组消息对象转成 JSON 字符串，方便在 Django 里存数据库或记录日志
+                    ensure_ascii=False
+                )[:10000],
+                output=full_output[:500],
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                total_tokens=total_tokens,
+            )
+
+
+
         # 修改输出方式
         response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
         response['Cache-Control'] = 'no-cache'

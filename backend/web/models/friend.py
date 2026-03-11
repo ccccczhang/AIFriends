@@ -21,7 +21,7 @@ class Friend(models.Model):
 class Message(models.Model):
     friend = models.ForeignKey(Friend, on_delete=models.CASCADE)
     user_message = models.TextField(max_length=500)
-    input = models.TextField(max_length=500) # 对大模型的输入
+    input = models.TextField(max_length=10000) # 对大模型的输入
     output = models.TextField(max_length=500) # 对大模型的输出
     input_tokens = models.IntegerField(default=0) # 输入的 tokens Integer: 整数int
     output_tokens = models.IntegerField(default=0) # 输出的 tokens
