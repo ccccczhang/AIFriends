@@ -1,13 +1,13 @@
 import json
 
 from django.http import StreamingHttpResponse
-from langchain_core.messages import HumanMessage, BaseMessageChunk
+from langchain_core.messages import HumanMessage, BaseMessageChunk, SystemMessage, AIMessage
 from rest_framework.renderers import BaseRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from web.models.friend import Friend, Message
+from web.models.friend import Friend, Message, SystemPrompt
 from web.views.friend.message.chat.graph import ChatGraph
 
 # 告诉 Django REST framework：这是一个用来输出 SSE 的 Renderer，
@@ -17,6 +17,25 @@ class SSERenderer(BaseRenderer):
     format = 'txt'
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data
+
+def add_system_prompt(state, friend):
+    msgs = state['messages']
+    system_prompts = SystemPrompt.objects.filter(title='回复').order_by('order_number')
+    prompt = ''
+    for sp in system_prompts:
+        prompt += sp.prompt
+    prompt += f"\n【角色性格】\n{friend.character.profile}\n"
+    return {'messages': [SystemMessage(prompt)] + msgs}
+
+def add_recent_messages(state, friend):
+    msgs = state['messages']
+    message_raw = list(Message.objects.filter(friend=friend).order_by('-id')[:10]) # 顺序是：最新 → 最旧
+    message_raw.reverse() # 顺序是：最旧 → 最新，因为大模型上下文必须是：旧对话 -> 新对话
+    messages = [] # 准备 LangGraph message 列表
+    for m in message_raw:
+        messages.append(HumanMessage(m.user_message))
+        messages.append(AIMessage(m.output))
+    return {'messages': msgs[:1] + messages + msgs[-1:]} # msgs[-1:]取最后一条消息
 
 class MessageChatView(APIView):
     permission_classes = [IsAuthenticated]
@@ -42,6 +61,8 @@ class MessageChatView(APIView):
         inputs = {
             'messages': [HumanMessage(message)], # 因为graph.py为messages
         }
+        inputs = add_system_prompt(inputs, friend)
+        inputs = add_recent_messages(inputs, friend)
 
         def event_stream(): # 流式输出
             full_output = '' # 把大模型输出存入Message数据库？中
