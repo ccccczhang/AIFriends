@@ -19,7 +19,7 @@ class SSERenderer(BaseRenderer):
     format = 'txt'
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data
-
+# 添加系统提示词
 def add_system_prompt(state, friend):
     msgs = state['messages']
     system_prompts = SystemPrompt.objects.filter(title='回复').order_by('order_number')
@@ -52,20 +52,24 @@ class MessageChatView(APIView):
             return Response({
                 'result': '消息不能为空'
             })
-        friends = Friend.objects.filter(pk=friend_id, me__user=request.user) #pk:Primary Key（主键）
+        # 这段是什么意思？？？
+        friends = Friend.objects.filter(pk=friend_id, me__user=request.user)  #pk: Primary Key（主键）
         if not friends.exists():
             return Response({
                 'result': '好友不存在'
             })
         friend = friends.first()
+
+
         # 用langGraph搭建大模型
         app = ChatGraph.create_app()
-
         inputs = {
             'messages': [HumanMessage(message)], # 因为graph.py为messages
         }
         inputs = add_system_prompt(inputs, friend)
         inputs = add_recent_messages(inputs, friend)
+
+
 
         def event_stream(): # 流式输出
             full_output = '' # 把大模型输出存入Message数据库？中

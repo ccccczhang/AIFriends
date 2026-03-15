@@ -1,6 +1,9 @@
 import os
+from pprint import pprint
 from typing import TypedDict, Annotated, Sequence
 
+import lancedb
+from langchain_community.vectorstores import LanceDB
 from langchain_core.messages import BaseMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -8,6 +11,9 @@ from langgraph.constants import START, END
 from langgraph.graph import add_messages, StateGraph
 from django.utils.timezone import localtime, now
 from langgraph.prebuilt import ToolNode
+from openai import embeddings
+
+from web.documents.utils.custom_embeddings import CustomEmbeddings
 
 
 class ChatGraph:
@@ -18,7 +24,22 @@ class ChatGraph:
             """当需要查询精确时间时，调用此函数。返回格式为:[年-月-日 时:分:秒]"""  # 三个引号在python里表示函数的文档，必须紧跟在函数下面，作用是告诉大模型它是干嘛的
             return localtime(now()).strftime('%Y-%m-%d %H:%M:%S')
 
-        tools = [get_time]
+        @tool
+        def search_knowledge_base(quary: str) -> str:
+            """ 当用户查询阿里云百炼平台的相关信息时，调用此函数。输入为要查询的问题，输出为查询结果。 """
+            db = lancedb.connect('./web/documents/lancedb_storage')
+            embeddings = CustomEmbeddings()
+            vector_db = LanceDB(
+                connection=db,
+                embedding=embeddings,
+                table_name='my_knowledge_base',
+            )
+            docs = vector_db.similarity_search(quary, k=3) # 查询三个文档
+            context = '\n\n'.join([f'内容片段：{i + 1}\n{doc.page_content}' for i, doc in enumerate(docs)]) # 把文档结果拼接起来, i + 1：从下标1开始
+            return f'从知识库中找到以下信息：\n\n{context}\n'
+
+
+        tools = [get_time, search_knowledge_base] # 这里是所有工具
 
         llm = ChatOpenAI(
             model = 'deepseek-v3.2',
@@ -39,6 +60,7 @@ class ChatGraph:
 
         # 定义 agent：对大模型的调用
         def model_call(state: AgentState) -> AgentState:
+            pprint(state['messages'])
             res = llm.invoke(state['messages']) # invoke 表示对大模型的调用
             return {'messages': [res]}
 
