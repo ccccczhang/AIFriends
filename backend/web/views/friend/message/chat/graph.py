@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 from typing import TypedDict, Annotated, Sequence
 
 import lancedb
@@ -60,7 +59,6 @@ class ChatGraph:
 
         # 定义 agent：对大模型的调用
         def model_call(state: AgentState) -> AgentState:
-            pprint(state['messages'])
             res = llm.invoke(state['messages']) # invoke 表示对大模型的调用
             return {'messages': [res]}
 
