@@ -41,7 +41,7 @@ class ChatGraph:
         tools = [get_time, search_knowledge_base] # 这里是所有工具
 
         llm = ChatOpenAI(
-            model = 'deepseek-v3.2',
+            model = 'qwen-plus',
             openai_api_key = os.getenv('API_KEY'),
             openai_api_base = os.getenv('API_BASE'),
             streaming = True,  # 流式输出
