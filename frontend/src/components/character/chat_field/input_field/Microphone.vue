@@ -55,8 +55,9 @@ const sendToBackend = async (arrayBuffer) => {
   formData.append("audio", blob, 'voice.pcm')
 
   try {
-    const res = await api.post('', formData)
+    const res = await api.post('/api/friend/message/asr/asr/', formData)
     const data = res.data
+    console.log(data)
     if (data.result === 'success') {
       emit('send', null, data.text)
     }
@@ -80,7 +81,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="absolute bottom-4 left-2 h-12 w-86 flex items-center bg-black/30 backdrop-blur-sm rounded-2xl">
-    <div v-if="!isSpeaking" class="flex items-center justify-center gap-1 h-6 flex-1">
+    <div v-if="isSpeaking" class="flex items-center justify-center gap-1 h-6 flex-1">
       <div
         v-for="i in 32" :key="i"
         class="w-0.5 bg-blue-400 rounded-full animate-wave"
