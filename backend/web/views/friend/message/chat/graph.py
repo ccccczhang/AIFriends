@@ -20,7 +20,7 @@ class ChatGraph:
     def create_app():
         @tool # 工具
         def get_time() -> str:
-            """当需要查询精确时间时，调用此函数。返回格式为:[年-月-日 时:分:秒]"""  # 三个引号在python里表示函数的文档，必须紧跟在函数下面，作用是告诉大模型它是干嘛的
+            """当用户询问当前时间、现在几点、今天日期、当前时间戳、具体时间相关的问题，必须调用此工具。按照以下格式返回时间。"""
             return localtime(now()).strftime('%Y-%m-%d %H:%M:%S')
 
         @tool

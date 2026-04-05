@@ -82,6 +82,7 @@ class MessageChatView(APIView):
             content_type="text/event-stream",
         )
         response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no' # 避免缓存
         return response
 
     async def tts_sender(self, app, inputs, mq, ws, task_id):
@@ -187,7 +188,6 @@ class MessageChatView(APIView):
             full_output = full_output + json.dumps(msg, ensure_ascii=False)
             if not msg: # work 最后返回一个null
                 break
-            print(msg)
             # msg 有三种可能
             if msg.get('content', None): #如果存在，返回它的值，如果不存在，返回默认值 None
                 full_output += msg['content']
