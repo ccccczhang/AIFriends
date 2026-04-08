@@ -48,7 +48,6 @@ function handlePushFrontMessage(msg) {
 }
 
 function handclose() {
-  modalRef.value.close()
   inputRef.value.close()
 }
 
@@ -58,10 +57,10 @@ defineExpose({
 </script>
 
 <template>
-  <dialog ref="modal-ref" class="modal">
+  <dialog ref="modal-ref" class="modal" @close="handclose">
     <div class="modal-box w-90 h-150" :style="modalStyle">
       <!-- transparent: 透明的 -->
-      <button @click="handclose" class="btn btn-sm btn-circle btn-ghost bg-transparent absolute top-1 right-1">✕</button>
+      <button @click="modalRef.close()" class="btn btn-sm btn-circle btn-ghost bg-transparent absolute top-1 right-1">✕</button>
       <ChatHistory
           ref="chat-history-ref"
           v-if="friend"
