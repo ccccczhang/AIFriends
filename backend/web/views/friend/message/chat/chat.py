@@ -60,7 +60,7 @@ class MessageChatView(APIView):
             return Response({
                 'result': '消息不能为空'
             })
-        # 这段是什么意思？？？
+
         friends = Friend.objects.filter(pk=friend_id, me__user=request.user)  #pk: Primary Key（主键）
         if not friends.exists():
             return Response({
