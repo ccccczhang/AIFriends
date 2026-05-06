@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 
+
 load_dotenv() # 把 .env 文件里的“环境变量”，加载到当前 Python 进程的 os.environ 里。因为.gitignore了为了使用APIKEY,API_BASE就需要使用这个函数
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
