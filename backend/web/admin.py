@@ -1,7 +1,7 @@
 # 后台管理系统，这里是在：定制后台页面怎么用
 from django.contrib import admin
 from web.models.user import UserProfile
-from web.models.character import Character
+from web.models.character import Character, Voice
 from web.models.friend import Friend, Message, SystemPrompt
 
 @admin.register(UserProfile) #注册模型到后台
@@ -11,7 +11,9 @@ class UserProfileAdmin(admin.ModelAdmin): #告诉 Django：admin 后台要管理
 
 @admin.register(Character)
 class CharacterAdmin(admin.ModelAdmin):
-    raw_id_fields = ('author',)
+    raw_id_fields = ('author', 'voice')
+
+admin.site.register(Voice)
 
 
 @admin.register(Friend)
