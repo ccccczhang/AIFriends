@@ -53,9 +53,16 @@ class ChatGraph:
         ).bind_tools(tools)
 
 
-        # 记录状态state 信息的存储方式
-        class AgentState(TypedDict): # 不覆盖，追加到旧消息末尾
-            messages: Annotated[Sequence[BaseMessage], add_messages] #Annotated:给类型Sequence[BaseMessage](是 LangChain 里的消息基类)附加“额外语义信息”，add_messages:当多个节点返回 messages 时，不要覆盖，而是“追加合并”
+        # 记录状态state 信息的存储方式，不覆盖，追加到旧消息末尾
+        class AgentState(TypedDict): # TypedDict 用于声明一种字典类型，要求其所有实例都必须拥有一组特定的键，且每个键都对应类型一致的值。该要求不会在运行时进行检查，仅由类型检查器强制执行，在这里：TypedDict = Agent 的状态结构
+            messages: Annotated[Sequence[BaseMessage], add_messages] # Annotated(一种特殊的 typing 形式，用于为注解添加上下文相关的元数据。):给类型 Sequence[BaseMessage](是 LangChain 里的消息基类)附加“额外语义信息”，
+            #Sequence作用：只读序列类型, 相当于list, tuple  add_messages(LangGraph 内置 reducer): 当多个节点返回 messages 时，不要覆盖，而是“追加合并”
+        # BaseMessage 作用：所有消息的父类
+        # BaseMessage
+        # ├── HumanMessage
+        # ├── AIMessage
+        # ├── SystemMessage
+        # └── ToolMessage
 
         # 定义 agent：对大模型的调用
         def model_call(state: AgentState) -> AgentState:
@@ -67,6 +74,7 @@ class ChatGraph:
             if last_message.tool_calls:
                 return "tools"
             return "end"
+
         # 定义工具节点
         tool_node = ToolNode(tools)
 

@@ -132,7 +132,7 @@ async function handleSend(event, audio_msg) {
         friend_id: props.friendId,
         message: content,
       },
-      onmessage(data, isDone) { // 这个onmessage, onerror都是streamApi.js中定义的
+      onmessage(data, isDone) { // 这个 onmessage, onerror都是streamApi.js中定义的
         if (curID !== processID) return
 
         if (data.content) { // 这个content是chat.py中的

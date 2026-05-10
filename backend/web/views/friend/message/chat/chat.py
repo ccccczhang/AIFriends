@@ -46,7 +46,7 @@ def add_recent_messages(state, friend):
     for m in message_raw:
         messages.append(HumanMessage(m.user_message))
         messages.append(AIMessage(m.output))
-    return {'messages': msgs[:1] + messages + msgs[-1:]} # msgs[-1:]取最后一条消息
+    return {'messages': msgs[:1] + messages + msgs[-1:]} # msgs[:1]取第一条信息SystemMessage，msgs[-1:]取最后一条消息，就是HumanMessage
 
 class MessageChatView(APIView):
     permission_classes = [IsAuthenticated]
@@ -72,13 +72,13 @@ class MessageChatView(APIView):
         app = ChatGraph.create_app()
         inputs = {
             'messages': [HumanMessage(message)], # 因为graph.py为messages
-        }
-        inputs = add_system_prompt(inputs, friend)
+        } # 此时 inputs['messages'] 长度=1
+        inputs = add_system_prompt(inputs, friend) # 此时 inputs['messages'] 结构：[SystemMessage(...), HumanMessage(message)]，长度=2
         inputs = add_recent_messages(inputs, friend)
 
         # 修改输出方式
-        response = StreamingHttpResponse(
-            self.event_stream(app, inputs, friend, message),
+        response = StreamingHttpResponse( # StreamingHttpResponse 是 Django 提供的一个 流式 HTTP 响应类，将服务器端动态生成的内容分块（chunked）逐步发送给客户端
+            self.event_stream(app, inputs, friend, message), # event_stream ：普通的数据生成器（协程）
             content_type="text/event-stream",
         )
         response['Cache-Control'] = 'no-cache'

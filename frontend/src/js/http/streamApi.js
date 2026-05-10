@@ -50,6 +50,7 @@ export default async function streamApi(url, options = {}) {
                     const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.detail || `请求失败: ${response.status}`);
                 }
+
             },
 
             onmessage(msg) {
